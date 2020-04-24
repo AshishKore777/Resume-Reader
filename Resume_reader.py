@@ -1,12 +1,30 @@
+"""
+    Title: Resume-Reader
+    Author:Ashish Kore and Syeda Atiya Husain
+    Language: Python
+    Requirements:
+    Python version-> 3 or later
+    Python Packages or Modules->    1. pandas
+                                    2. re
+    Additional Files->      1. Resume Headings & Subheadings.xlsx
+"""
+
+#importing required necessary packages and modules
 import pandas as pd
 import re
+
 def reader(x):
+"""
+This function is defined so as to convert a parsed resume into a key value pair format (dictionary). 
+The heaadings in the resume becomes keys in the dictionary and their content becomes their value in the same.
+It takes parsed resume text as input(parameter) to perform this task.
+"""
     
-    df = pd.read_excel('Resume Headings & Subheadings.xlsx')
+    df = pd.read_excel('Resume Headings & Subheadings.xlsx') #load heading dataset
     headings=df['headings']
     headings=headings.dropna()
 
-    #Atiya's code
+    # This part of code fetches all the headings from the resume which have new line (\n) after them.
     resume=x.split("\n")
     resume_len=len(resume)
     for i in range(resume_len):
@@ -25,23 +43,15 @@ def reader(x):
             if len(to)!=0:
                 if j == to[0].lower():
                     keys.append([to[0],i,"a"])
-
     key_len=len(keys)
 
-    #Mansi's Code
     def func1():
-                  
-
+    """
+    This part of code fetches all the headings from the resume which have tab space (\t) after them.
+    """        
         count=-1
-        head,list=[],[]
-
-        # hd=headings.iloc[:,:-1].values.tolist()
-        # for i in hd:
-        #     list.append(i[0])
-
-        
+        head,list=[],[]        
         for i in resume:
-       
             count+=1
             if "\t" in i:
                 r=re.findall(r'[\w\s]*?[\w]+\t',i)
@@ -53,13 +63,14 @@ def reader(x):
     func1()
 
     def func2():
+    """
+    This part of code fetches all the headings from the resume which have colon or hyphen after them.
+    """ 
         list,head=[],[]
         count=-1
-
         for i in resume:
             count+=1
             if ":" in i or "\t" in i or "-" in i:
-#                 r=re.findall(r'[\w\s\t\n]?[\w]+[:\t-]+?[\w\n]?',i)
                 r=re.findall(r'[\w\s\t\n]?[\w\s]+[:\t-\n\s]+?',i)
                 if len(r)!=0:
                     for j in range(len(r)):
@@ -68,16 +79,14 @@ def reader(x):
                         r[j]=r[j].replace('-','')
                         if r[j].lower() in copy_headings:
                             if ([r[0],count,'a'] not in keys) and ([r[0],count,'m'] not in keys):
-                                keys.append([r[0],count,"m"])
-
-                                
+                                keys.append([r[0],count,"m"])                          
     func2()
-
+    
+    #This part of code merges all the headings obtained from the above three sections.
     x=[]
     for i in keys:
         x.append(i[1])
     x.sort()
-
     final_head=[]
     for i in range(len(x)):
         for j in range(len(x)):
@@ -85,8 +94,8 @@ def reader(x):
                 final_head.append(keys[j])
     keys=final_head
 
-
-    #Atiya's Code
+    #This part of code determines the contents which lies under headings in the resume.
+    #Also it forms the dictionary having headings as keys and content as their values
     dic={}
     resume_len=len(resume)
     key_len=len(keys)
@@ -96,7 +105,7 @@ def reader(x):
                 value+=resume[i]
             dic[keys[key][0]]=value
             value=""
-
+            
         elif keys[key][2]=='m':
             value=""
             resume_len=len(resume)
@@ -107,7 +116,7 @@ def reader(x):
                     value+=resume[i]
             dic[keys[key][0]]=value
             value=""
-    print(keys)
+
     if keys[-1][2]=='a':
         for i in range(keys[key_len-1][1]+1,resume_len):
             value+=resume[i]
@@ -115,7 +124,6 @@ def reader(x):
     elif keys[-1][2]=='m':
         for i in range(keys[key_len-1][1],resume_len):
             value+=resume[i].replace(keys[key_len-1][0],"")
-
         dic[keys[key_len-1][0]]=value
     temp=resume[:keys[0][1]]
     about_cont=[]
@@ -123,121 +131,6 @@ def reader(x):
         if i not in ['\n',' \n','\n ',' \n ']:
             about_cont.append(i)
     dic["about"]=''.join(about_cont)
+    
+    #Returns the final dictionary with headings as keys and content as values.
     return dic
-
-# x='''AKALILI BAZILAH BINTI MOHD POAT 
-
-# NRIC 9210017-14-5592   AGE: 25     MARITAL STATUS  Single 
-
- 
-
- 
-
- 
-
- 
-
- 
-
-# EDUCATION 
-
-# 2011 - 2014 Bachelor in Business Management (Hons) in Human Resource 
-# Management 
-# Universiti Teknologi MARA (UiTM) Seri Iskandar, Perak 
-# CGPA : 3.16 
- 
-
-# 2010 – 2011 Matriculation Certificate in Accountancy 
-# Perlis Matriculation College 
-# CGPA: 3.26 
- 
-
-# 2008 – 2009 Sijil Pelajaran Malaysia (SPM) 
-# Sekolah Menengah Teknik Setapak, Kuala Lumpur 
-# SPM: 4A 3B 3D 
- 
-
- 
-
-# PROFFESIONAL SKILLS     
-
-#  Average Good Skilled 
-
-# Word ● ● ● ● ● ● ● ● ●  
-
-# Excel ● ● ● ● ● ● ● ● ○ 
-
-# PowerPoint ● ● ● ● ● ● ● ● ○ 
-
-# Outlook ● ● ● ● ● ○ ○ ○ ○ 
-
-# Photoshop ● ● ● ○ ○ ○ ○ ○ ○  
-
-# Bahasa Melayu ● ● ● ● ● ● ● ● ● 
-
-# English ● ● ● ● ● ● ○ ○ ○ 
-
- 
-
-
-
-# EMPLOYMENT  
-
-# Jun 2015 - Branch Service Operations – Adecco Staffing and Outsourcing 
-# Sep 2017 Administrative Assistant – Contract Staff 
-
-#  Perform master debit card stocks and stationaries monitoring. 
-#  Download reports 
-#  Perform card issuance 
-#  Check statement address and reprint mailer. 
-#  Perform change of address and customer’s contact details for CBOL  
-#  Monitoring delivery failure as perform enrolment for undelivered 
-
-# statements. 
-#  Responsible for daily system maintenance: 
-
-#  Activate customer’s account 
-#  Delink customer’s account for housekeeping purpose 
-#  Amendment of defect information 
-
-#  Update customer deceased and staff termination 
-# information status 
-
-#  Perform chequebook maintenance as prepare chequebook order, 
-# send out as per request and change of address 
-
- 
-
-#   Citibank Berhad (Banking) – Adecco Staffing and Outsourcing 
-#   Service Admin – Contract Staff 
-
-#  Scan new/existing AOFs/FATCA/PADD into documentum 
-#  Signature scanning into Eclipse and review customer’s signature to 
-
-# match against AOF letter forms 
-#  Returned statements maker; time stamp and key in information 
-
-# into database 
-#  Responsible for system maintenance: 
-
-#  Activate customer’s account 
-#  Amendment of defect information 
-#  Update Know-Your-Customer (KYC) 
-
-#  Update customer deceased and staff termination 
-# information 
-
-#  Perform chequebook maintenance as arrange chequebook order, 
-# send out as per request and change of address. 
-
- 
-
-# REFERENCES 
-  
-# How Mei Cheng +6012 201 0123 
-# Assistant Manager of Branch Service Department, Citibank 
- 
-# Noor Zahirah Binti Mohd Zaidon +6012 677 2728 
-# Assistant Manager of Branch Service Department, Citibank'''
-
-# z=reader(x)
