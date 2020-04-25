@@ -125,6 +125,7 @@ It takes parsed resume text as input(parameter) to perform this task.
         for i in range(keys[key_len-1][1],resume_len):
             value+=resume[i].replace(keys[key_len-1][0],"")
         dic[keys[key_len-1][0]]=value
+        
     temp=resume[:keys[0][1]]
     about_cont=[]
     for i in temp:
